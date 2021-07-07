@@ -53,7 +53,7 @@ docker-compose ps
 docker-compose logs
 ```
 
-## MySQL / MariaDB
+## MySQL
 
 Default connection information:
 
