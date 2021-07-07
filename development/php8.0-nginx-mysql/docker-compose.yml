@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+
+  espocrm-mysql:
+    container_name: espocrm-mysql
+    image: mysql:latest # or mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 1
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+
+  espocrm-nginx:
+    image: nginx
+    container_name: espocrm-nginx
+    volumes:
+      - ./html:/var/www/html
+      - ./logs:/var/log/nginx
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/espocrm.conf:/etc/nginx/espocrm.conf
+    restart: unless-stopped
+    ports:
+      - 8080:80
+
+  espocrm-php:
+   container_name: espocrm-php
+   build:
+     context: ./php
+     dockerfile: Dockerfile
+   volumes:
+    - ./html:/var/www/html
+   restart: unless-stopped
