@@ -1,0 +1,7 @@
+/development/*/html/*
+/development/*/logs/*
+/development/*/mysql/*
+
+/production/*/html/*
+/production/*/logs/*
+/production/*/mysql/*
