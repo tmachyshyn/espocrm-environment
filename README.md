@@ -11,8 +11,8 @@ This repository contains examples of production and development environments for
 docker-compose up -d
 ```
 
-3. Wait some time for deploying the containers.
-4. Download and extract EspoCRM files at `html` directory.
+3. Wait some time for containers deployment.
+4. Download and extract EspoCRM files to the `html` directory.
 5. Visit `http://localhost:8080` and install EspoCRM.
 
 ## Usage
