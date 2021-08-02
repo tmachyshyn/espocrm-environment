@@ -12,7 +12,7 @@ docker-compose up -d
 ```
 
 3. Wait some time for deploying the containers.
-4. Download and extract EspoCRM files at `html` directory.
+4. Download and extract EspoCRM files to the `html` directory.
 5. Visit `http://localhost:8080` and install EspoCRM.
 
 ## Usage
