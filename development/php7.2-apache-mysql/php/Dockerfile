@@ -16,7 +16,6 @@ RUN set -ex; \
     ; \
     \
     pecl install zmq-beta; \
-    pecl install mailparse; \
     \
     docker-php-ext-install pdo_mysql; \
     docker-php-ext-install zip; \
@@ -27,7 +26,6 @@ RUN set -ex; \
     docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/; \
     docker-php-ext-install ldap; \
     docker-php-ext-install exif; \
-    docker-php-ext-enable mailparse; \
     docker-php-ext-enable zmq; \
     \
 # reset a list of apt-mark
