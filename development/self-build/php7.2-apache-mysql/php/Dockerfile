@@ -63,8 +63,12 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get install -y nodejs
 
 # Install Grunt
-RUN npm update -g npm \
-    && npm install -g grunt-cli
+RUN npm update -g npm; \
+    npm install -g grunt-cli; \
+    mkdir -p /var/www/.npm; \
+    mkdir -p /var/www/.config; \
+    chown www-data:www-data /var/www/.npm; \
+    chown www-data:www-data /var/www/.config
 
 # Install PHPUNIT
 RUN wget -P /tmp https://phar.phpunit.de/phpunit.phar \
