@@ -1,9 +1,9 @@
-/development/*/html/*
-/development/*/logs/*
-/development/*/mysql/*
-/development/*/mariadb/*
+/development/**/html/*
+/development/**/logs/*
+/development/**/mysql/*
+/development/**/mariadb/*
 
-/production/*/html/*
-/production/*/logs/*
-/production/*/mysql/*
-/production/*/mariadb/*
+/production/**/html/*
+/production/**/logs/*
+/production/**/mysql/*
+/production/**/mariadb/*
