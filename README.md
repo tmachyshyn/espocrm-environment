@@ -53,7 +53,9 @@ docker-compose ps
 docker-compose logs
 ```
 
-## MySQL
+## Database
+
+### MySQL
 
 Default connection information:
 
@@ -61,7 +63,7 @@ Default connection information:
 - User: `root`
 - Password: `1`
 
-## MariaDB
+### MariaDB
 
 Default connection information:
 
@@ -69,12 +71,40 @@ Default connection information:
 - User: `root`
 - Password: `1`
 
+### PhpMyAdmin
+
+#### 1. Open a port for the container
+
+Edit the `docker-compose.yml`:
+
+```
+espocrm-mysql:
+    .....
+    ports:
+      - 8033:3306
+```
+
+#### 2. Modify phpMyAdmin configuration
+
+Edit the file `config.inc.php` under the phpMyAdmin directory:
+
+```
+$i++;
+$cfg['Servers'][$i]['verbose'] = 'Docker: espocrm-mysql';
+$cfg['Servers'][$i]['host'] = '127.0.0.1';
+$cfg['Servers'][$i]['port'] = 8033;
+$cfg['Servers'][$i]['socket'] = '';
+$cfg['Servers'][$i]['auth_type'] = 'cookie';
+$cfg['Servers'][$i]['user'] = 'root';
+$cfg['Servers'][$i]['password'] = '';
+```
+
 ## Crontab
 
 ### Method 1: setup from the host
 
 ```
-* * * * * /usr/bin/docker exec --user www-data espocrm-php php cron.php
+* * * * * /usr/bin/docker exec --user www-data -i espocrm-php /bin/bash -c "cd /var/www/html; php cron.php" > /dev/null 2>&1
 ```
 
 ## Run tests
