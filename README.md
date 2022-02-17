@@ -59,7 +59,8 @@ docker-compose logs
 
 Default connection information:
 
-- Host: `espocrm-mysql`
+- Host Name: `espocrm-mysql`
+- Database Name: `ANY`
 - User: `root`
 - Password: `1`
 
@@ -67,7 +68,8 @@ Default connection information:
 
 Default connection information:
 
-- Host: `espocrm-mariadb`
+- Host Name: `espocrm-mariadb`
+- Database Name: `ANY`
 - User: `root`
 - Password: `1`
 
