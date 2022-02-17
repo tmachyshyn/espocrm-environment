@@ -68,11 +68,16 @@ RUN set -ex; \
 # Set timezone
 RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# Install git, wget, cron
-RUN apt-get update; \
-    apt-get install -y git; \
-    apt-get install -y wget; \
-    apt-get install -y cron
+# Install required libs
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        git \
+        wget \
+        unzip \
+        libldap-common \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
 # Install composer globally
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
