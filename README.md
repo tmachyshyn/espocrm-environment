@@ -122,3 +122,46 @@ $cfg['Servers'][$i]['password'] = '';
 ```
 /usr/bin/docker exec --user www-data phpunit --bootstrap vendor/autoload.php tests/integration
 ```
+
+## WebSocket
+
+#### 1. Add Websocket to your docker-compose file 
+
+Edit the `docker-compose.yml`:
+
+```
+espocrm-websocket:
+    image: espocrm/espocrm
+    container_name: espocrm-websocket    
+    volumes:
+      - ./html:/var/www/html
+    restart: always
+    entrypoint: php websocket.php
+    ports:
+      - 8081:8080
+```
+
+#### 2. Add Websocket settings to your instance
+
+In your data/config.php add:
+
+```
+'useWebSocket' => true,
+'webSocketUrl' => 'ws://localhost:8081',
+'webSocketZeroMQSubscriberDsn' => 'tcp://*:7777',
+'webSocketZeroMQSubmissionDsn' => 'tcp://espocrm-websocket:7777',
+```
+
+#### 3. Restart your container 
+
+Inside your directory with `docker-composer.yml` file run the command:
+
+```
+sudo docker-compose down -v
+```
+
+Then:
+
+```
+sudo docker-compose up -d --build "$@"
+```
