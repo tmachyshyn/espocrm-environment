@@ -66,54 +66,6 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
-# Set timezone
-RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
-
-# Install git, wget
-RUN apt-get update; \
-    apt-get install -y git; \
-    apt-get install -y wget
-
-# Install composer globally
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-    && php -r "unlink('composer-setup.php');" \
-    && mkdir -p "/var/www/.composer" \
-    && chown www-data:www-data "/var/www/.composer"
-
-# Install npm
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
-    && apt-get install -y nodejs
-
-# Install Grunt
-RUN npm install -g grunt-cli; \
-    mkdir -p /var/www/.npm; \
-    mkdir -p /var/www/.config; \
-    npm install -g npm@latest
-
-# Install PHPUNIT
-RUN wget -P /tmp https://phar.phpunit.de/phpunit.phar \
-    && mv /tmp/phpunit.phar /usr/local/bin/phpunit \
-    && chmod +x /usr/local/bin/phpunit
-
-# Set available directory list
-# ONLY FOR TEST ENVIRONMENT: Options Indexes
-RUN { \
-    echo '<VirtualHost *:80>'; \
-    echo '    ServerName localhost'; \
-    echo '    DocumentRoot /var/www/html'; \
-    echo '    DirectoryIndex index.php index.html'; \
-    echo '    <Directory "/var/www/html">'; \
-    echo '        Options Indexes FollowSymLinks'; \
-    echo '        AllowOverride All'; \
-    echo '        Require all granted'; \
-    echo '    </Directory>'; \
-    echo ''; \
-    echo '    ErrorLog ${APACHE_LOG_DIR}/error.log'; \
-    echo '    CustomLog ${APACHE_LOG_DIR}/access.log combined'; \
-    echo '</VirtualHost>'; \
-} > /etc/apache2/sites-available/000-default.conf
-
 # php.ini
 RUN { \
     echo 'expose_php = Off'; \
