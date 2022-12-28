@@ -1,7 +1,6 @@
 FROM php:8.1-apache
 
 # Install php libs
-
 RUN set -ex; \
     \
     aptMarkList="$(apt-mark showmanual)"; \
@@ -87,7 +86,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && chown www-data:www-data "/var/www/.composer"
 
 # Install npm
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs
 
 # Install Grunt
@@ -97,7 +96,6 @@ RUN npm update -g npm; \
     mkdir -p /var/www/.config; \
     chown www-data:www-data /var/www/.npm; \
     chown www-data:www-data /var/www/.config
-
 
 # Install PHPUNIT
 RUN wget -P /tmp https://phar.phpunit.de/phpunit.phar \
