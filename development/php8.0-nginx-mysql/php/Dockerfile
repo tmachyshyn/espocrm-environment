@@ -32,7 +32,7 @@ RUN set -ex; \
     ldconfig; \
     ldconfig -p | grep zmq; \
     cd /home; \
-    git clone git://github.com/mkoppanen/php-zmq.git; \
+    git clone https://github.com/mkoppanen/php-zmq.git; \
     cd /home/php-zmq; \
     phpize && ./configure; \
     make; \
