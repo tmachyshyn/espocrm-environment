@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+
+  espocrm-mariadb:
+    container_name: espocrm-mariadb
+    image: mariadb:latest # or mariadb:10.3.27
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 1
+    volumes:
+      - ./mariadb/data:/var/lib/mysql
+
+  espocrm-nginx:
+    image: nginx
+    container_name: espocrm-nginx
+    volumes:
+      - ./html:/var/www/html
+      - ./logs:/var/log/nginx
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/espocrm.conf:/etc/nginx/espocrm.conf
+    restart: unless-stopped
+    ports:
+      - 8080:80
+
+  espocrm-php:
+   container_name: espocrm-php
+   build:
+     context: ./php
+     dockerfile: Dockerfile
+   volumes:
+    - ./html:/var/www/html
+   restart: unless-stopped
