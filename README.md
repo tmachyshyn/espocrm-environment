@@ -73,6 +73,15 @@ Default connection information:
 - User: `root`
 - Password: `1`
 
+### PostgreSQL
+
+Default connection information:
+
+- Host Name: `espocrm-postgres`
+- Database Name: `espocrm`
+- User: `espocrm`
+- Password: `espo_password`
+
 ### PhpMyAdmin
 
 #### 1. Open a port for the container

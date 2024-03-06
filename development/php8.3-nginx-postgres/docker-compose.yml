@@ -1,0 +1,37 @@
+version: '3.2'
+
+services:
+
+  espocrm-postgres:
+    container_name: espocrm-postgres
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: espo_password
+      POSTGRES_USER: espocrm
+      POSTGRES_DB: espocrm
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+
+  espocrm-nginx:
+    image: nginx
+    container_name: espocrm-nginx
+    volumes:
+      - ./html:/var/www/html
+      - ./logs:/var/log/nginx
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/espocrm.conf:/etc/nginx/espocrm.conf
+    restart: unless-stopped
+    ports:
+      - 8096:80
+
+  espocrm-php:
+   container_name: espocrm-php
+   build:
+     context: ./php
+     dockerfile: Dockerfile
+   volumes:
+    - ./html:/var/www/html
+   restart: unless-stopped
