@@ -1,4 +1,4 @@
-FROM php:8.3.0RC5-fpm
+FROM php:8.3-fpm
 
 # Install php libs
 
