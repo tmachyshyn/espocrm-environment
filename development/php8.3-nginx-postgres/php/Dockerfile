@@ -18,6 +18,7 @@ RUN set -ex; \
         libldap2-dev \
         libzmq3-dev \
         zlib1g-dev \
+        freetype-dev \
         wget \
         git \
         unzip \
@@ -52,7 +53,7 @@ RUN set -ex; \
     docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql; \
     docker-php-ext-install pdo pdo_pgsql pgsql; \
     docker-php-ext-install zip; \
-    docker-php-ext-configure gd --with-jpeg; \
+    docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype; \
     docker-php-ext-install gd; \
     PHP_OPENSSL=yes docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
     docker-php-ext-install imap; \
