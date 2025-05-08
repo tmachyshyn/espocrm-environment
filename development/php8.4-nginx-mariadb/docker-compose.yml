@@ -19,7 +19,7 @@ services:
       - ./nginx/espocrm.conf:/etc/nginx/espocrm.conf
     restart: unless-stopped
     ports:
-      - 8095:80
+      - 8080:80
 
   espocrm-php:
    container_name: espocrm-php
