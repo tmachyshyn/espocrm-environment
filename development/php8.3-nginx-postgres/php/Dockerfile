@@ -7,60 +7,61 @@ RUN set -ex; \
     aptMarkList="$(apt-mark showmanual)"; \
     \
     apt-get update; \
+    # Install php libs
     apt-get install -y --no-install-recommends \
-        libjpeg-dev \
+        libpq-dev \
         libpng-dev \
+        libjpeg-dev \
+        libwebp-dev \
+        libfreetype6-dev \
         libzip-dev \
         libxml2-dev \
-        libpq-dev \
         libc-client-dev \
         libkrb5-dev \
         libldap2-dev \
-        libzmq3-dev \
+        libzmq5-dev \
         zlib1g-dev \
-        freetype-dev \
-        wget \
-        git \
-        unzip \
     ; \
     \
-# Install php-zmq
-    cd /home; \
-    wget https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz; \
-    tar -xvzf zeromq-4.3.4.tar.gz; \
-    wget https://github.com/zeromq/libzmq/archive/refs/heads/master.zip; \
-    unzip master.zip; \
-    cd /home/zeromq-4.3.4; \
-    rm -r tests; \
-    cd /home/libzmq-master; \
-    cp -r tests /home/zeromq-4.3.4/tests; \
-    cd /home/zeromq-4.3.4; \
-    ./configure; \
-    make; \
-    make install; \
-    ldconfig; \
-    ldconfig -p | grep zmq; \
-    cd /home; \
-    git clone https://github.com/mkoppanen/php-zmq.git; \
-    cd /home/php-zmq; \
-    phpize && ./configure; \
-    make; \
-    make install; \
+    # Install php-zmq
+        cd /usr; \
+        curl -fSL https://github.com/zeromq/php-zmq/archive/616b6c64ffd3866ed038615494306dd464ab53fc.tar.gz -o php-zmq.tar.gz; \
+        tar -zxf php-zmq.tar.gz; \
+        cd php-zmq*; \
+        phpize && ./configure; \
+        make; \
+        make install; \
+        cd .. && rm -rf php-zmq*; \
+    # END: Install php-zmq
     \
-# END Instalation php-zmq
+    docker-php-ext-configure ldap \
+        --with-libdir="lib/$(dpkg-architecture --query DEB_BUILD_MULTIARCH)" \
+    ; \
+    docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg=/usr \
+        --with-webp \
+    ; \
+    PHP_OPENSSL=yes docker-php-ext-configure imap \
+        --with-kerberos \
+        --with-imap-ssl \
+    ; \
     \
-    docker-php-ext-install pdo_mysql; \
-    docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql; \
-    docker-php-ext-install pdo pdo_pgsql pgsql; \
-    docker-php-ext-install zip; \
-    docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype; \
-    docker-php-ext-install gd; \
-    PHP_OPENSSL=yes docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
-    docker-php-ext-install imap; \
-    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/; \
-    docker-php-ext-install ldap; \
-    docker-php-ext-install exif; \
-    docker-php-ext-enable zmq; \
+    docker-php-ext-install -j$(nproc) \
+        gd \
+        pdo_pgsql \
+        pdo_mysql \
+        zip \
+        imap \
+        ldap \
+        exif \
+        pcntl \
+        posix \
+        bcmath \
+    ; \
+    docker-php-ext-enable \
+        zmq \
+    ; \
     \
 # reset a list of apt-mark
     apt-mark auto '.*' > /dev/null; \
@@ -74,37 +75,12 @@ RUN set -ex; \
         | xargs -rt apt-mark manual; \
     \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-    rm -rf /var/lib/apt/lists/*
-
-# Set timezone
-RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
-
-# Install git, wget, cron
-RUN apt-get update; \
-    apt-get install -y git; \
-    apt-get install -y wget; \
-    apt-get install -y cron
-
-# Install composer globally
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-    && php -r "unlink('composer-setup.php');" \
-    && mkdir -p "/var/www/.composer" \
-    && chown www-data:www-data "/var/www/.composer"
-
-# Install npm
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-    && apt-get install -y nodejs \
-    npm
-
-# Install Grunt
-RUN npm update -g npm \
-    && npm install -g grunt-cli
-
-# Install PHPUNIT
-RUN wget -P /tmp https://phar.phpunit.de/phpunit.phar \
-    && mv /tmp/phpunit.phar /usr/local/bin/phpunit \
-    && chmod +x /usr/local/bin/phpunit
+    # Install required libs
+    apt-get install -y --no-install-recommends \
+        unzip \
+        libldap-common \
+    ; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # php.ini
 RUN { \
