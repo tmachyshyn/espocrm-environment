@@ -9,16 +9,9 @@ RUN set -ex; \
     apt-get update; \
     # Install php libs
     apt-get install -y --no-install-recommends \
-        gcc \
-        make \
-        autoconf \
-        libc-dev \
-        pkg-config \
-        libssl-dev \
         libpq-dev \
-        libjpeg-dev \
         libpng-dev \
-        libmagickwand-dev \
+        libjpeg-dev \
         libwebp-dev \
         libfreetype6-dev \
         libzip-dev \
@@ -30,30 +23,36 @@ RUN set -ex; \
         zlib1g-dev \
     ; \
     \
-# Install IMAP via PECL
-    pecl install imap; \
-    docker-php-ext-enable imap; \
+    # Install php-zmq
+        cd /usr; \
+        curl -fSL https://github.com/zeromq/php-zmq/archive/616b6c64ffd3866ed038615494306dd464ab53fc.tar.gz -o php-zmq.tar.gz; \
+        tar -zxf php-zmq.tar.gz; \
+        cd php-zmq*; \
+        phpize && ./configure; \
+        make; \
+        make install; \
+        cd .. && rm -rf php-zmq*; \
+    # END: Install php-zmq
     \
-# Install php-zmq
-    cd /usr; \
-    curl -fSL https://github.com/zeromq/php-zmq/archive/ee5fbc693f07b2d6f0d9fd748f131be82310f386.tar.gz -o php-zmq.tar.gz; \
-    tar -zxf php-zmq.tar.gz; \
-    cd php-zmq*; \
-    phpize && ./configure; \
-    make; \
-    make install; \
-    cd .. && rm -rf php-zmq*; \
-# END: Install php-zmq
+    docker-php-ext-configure ldap \
+        --with-libdir="lib/$(dpkg-architecture --query DEB_BUILD_MULTIARCH)" \
+    ; \
+    docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg=/usr \
+        --with-webp \
+    ; \
+    PHP_OPENSSL=yes docker-php-ext-configure imap \
+        --with-kerberos \
+        --with-imap-ssl \
+    ; \
     \
-    debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-    docker-php-ext-configure ldap --with-libdir="lib/$debMultiarch"; \
-    docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp; \
-    \
-    docker-php-ext-install \
+    docker-php-ext-install -j$(nproc) \
+        gd \
         pdo_pgsql \
         pdo_mysql \
         zip \
-        gd \
+        imap \
         ldap \
         exif \
         pcntl \
@@ -81,20 +80,20 @@ RUN set -ex; \
         unzip \
         libldap-common \
     ; \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # php.ini
 RUN { \
-	echo 'expose_php = Off'; \
-	echo 'display_errors = Off'; \
-	echo 'display_startup_errors = Off'; \
-	echo 'log_errors = On'; \
-	echo 'memory_limit=256M'; \
-	echo 'max_execution_time=180'; \
-	echo 'max_input_time=180'; \
-	echo 'post_max_size=30M'; \
-	echo 'upload_max_filesize=30M'; \
-	echo 'date.timezone=UTC'; \
+    echo 'expose_php = Off'; \
+    echo 'display_errors = On'; \
+    echo 'display_startup_errors = On'; \
+    echo 'log_errors = On'; \
+    echo 'memory_limit=256M'; \
+    echo 'max_execution_time=180'; \
+    echo 'max_input_time=180'; \
+    echo 'post_max_size=30M'; \
+    echo 'upload_max_filesize=30M'; \
+    echo 'date.timezone=UTC'; \
 } > ${PHP_INI_DIR}/conf.d/espocrm.ini
 
 VOLUME /var/www/html
