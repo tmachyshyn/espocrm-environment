@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# SOURCE: https://github.com/espocrm/espocrm-docker/blob/master/fpm/docker-websocket.sh
+
 set -eu
 
 # entrypoint-utils.sh
